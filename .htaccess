@@ -1,11 +1,28 @@
-# Folder ini (di luar /public) tidak boleh diakses langsung lewat browser.
-# Perlindungan detail per-folder ada di config/, core/, controllers/, models/,
-# database/, dan storage/ masing-masing (lihat .htaccess di dalamnya).
-# File ini sengaja TIDAK memakai RewriteRule berbasis path absolut supaya
-# tidak error walau project diletakkan di subfolder htdocs mana pun.
+# =====================================================================
+# TK IT Quantum School - Hosting Root .htaccess
+# Didesain khusus untuk struktur folder di dalam public_html/
+# =====================================================================
 
 <IfModule mod_rewrite.c>
-RewriteEngine On
+    RewriteEngine On
+
+    # 1. Lindungi folder dan file sensitif dari akses browser
+    RewriteRule ^(config|controllers|core|database|models|routes|storage|views|\.git) - [F,L,NC]
+    RewriteRule \.(sql|env|log|ini|lock|json|md)$ - [F,L,NC]
+
+    # 2. File statis dari folder public (assets, uploads, favicon, dll.)
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(assets|uploads|favicon\.ico|robots\.txt)/(.*)$ public/$1/$2 [L,QSA]
+
+    # 3. Teruskan seluruh request routing lainnya ke public/index.php
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ public/index.php?url=$1 [QSA,L]
 </IfModule>
 
+# Set default document index
+DirectoryIndex index.php public/index.php
+
+# Matikan directory listing
 Options -Indexes

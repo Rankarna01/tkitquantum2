@@ -22,18 +22,29 @@ class App
             if (file_exists($controllerFile)) {
                 $this->controllerName = $controllerName;
                 unset($url[0]);
+            } else {
+                $this->show404();
+                return;
             }
         }
 
-        require dirname(__DIR__) . '/controllers/' . $this->controllerName . '.php';
+        require_once dirname(__DIR__) . '/controllers/' . $this->controllerName . '.php';
         $this->controller = new $this->controllerName();
 
-        if (isset($url[1]) && method_exists($this->controller, $url[1])) {
-            // Cegah pemanggilan method internal/private lewat URL
-            $reflection = new ReflectionMethod($this->controller, $url[1]);
-            if ($reflection->isPublic() && strpos($url[1], '__') !== 0) {
-                $this->method = $url[1];
-                unset($url[1]);
+        if (isset($url[1])) {
+            if (method_exists($this->controller, $url[1])) {
+                // Cegah pemanggilan method internal/private lewat URL
+                $reflection = new ReflectionMethod($this->controller, $url[1]);
+                if ($reflection->isPublic() && strpos($url[1], '__') !== 0) {
+                    $this->method = $url[1];
+                    unset($url[1]);
+                } else {
+                    $this->show404();
+                    return;
+                }
+            } else {
+                $this->show404();
+                return;
             }
         }
 
@@ -44,11 +55,23 @@ class App
 
     protected function parseUrl(): array
     {
-        if (isset($_GET['url'])) {
+        if (isset($_GET['url']) && trim($_GET['url']) !== '') {
             $url = rtrim($_GET['url'], '/');
             $url = filter_var($url, FILTER_SANITIZE_URL);
             return explode('/', $url);
         }
         return [];
+    }
+
+    protected function show404(): void
+    {
+        http_response_code(404);
+        $errorView = dirname(__DIR__) . '/views/errors/404.php';
+        if (file_exists($errorView)) {
+            require $errorView;
+        } else {
+            echo "404 - Halaman Tidak Ditemukan";
+        }
+        exit;
     }
 }
