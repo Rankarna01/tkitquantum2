@@ -19,27 +19,63 @@ class PermainanController extends Controller
     /** Hub: daftar semua game yang aktif */
     public function index(): void
     {
-        $pengaturanMenu = $this->permainanPengaturanModel->get();
+        try {
+            $pengaturanMenu = $this->permainanPengaturanModel->get();
+        } catch (Throwable $e) {
+            $pengaturanMenu = ['tampil_menu' => 'ya'];
+        }
+
         if (($pengaturanMenu['tampil_menu'] ?? 'ya') !== 'ya') {
             $this->abort(404, 'Halaman tidak ditemukan');
         }
 
+        try {
+            $daftarGame = $this->gameModel->getAktif();
+        } catch (Throwable $e) {
+            $daftarGame = PermainanGameModel::defaultGames();
+        }
+
+        try {
+            $pengaturan = $this->pengaturanModel->get();
+        } catch (Throwable $e) {
+            $pengaturan = [];
+        }
+
         $this->view('permainan/index', [
-            'pengaturan' => $this->pengaturanModel->get(),
-            'daftarGame' => $this->gameModel->getAktif(),
+            'pengaturan' => $pengaturan,
+            'daftarGame' => $daftarGame,
         ]);
     }
 
     /** Halaman satu game spesifik + leaderboard-nya */
     public function main(string $slug = ''): void
     {
-        $pengaturanMenu = $this->permainanPengaturanModel->get();
+        try {
+            $pengaturanMenu = $this->permainanPengaturanModel->get();
+        } catch (Throwable $e) {
+            $pengaturanMenu = ['tampil_menu' => 'ya'];
+        }
+
         if (($pengaturanMenu['tampil_menu'] ?? 'ya') !== 'ya') {
             $this->abort(404, 'Halaman tidak ditemukan');
         }
 
-        $game = $this->gameModel->getBySlug($slug);
-        if (!$game || $game['status'] !== 'aktif') {
+        try {
+            $game = $this->gameModel->getBySlug($slug);
+        } catch (Throwable $e) {
+            $game = null;
+        }
+
+        if (!$game) {
+            foreach (PermainanGameModel::defaultGames() as $dg) {
+                if ($dg['slug'] === $slug) {
+                    $game = $dg;
+                    break;
+                }
+            }
+        }
+
+        if (!$game || ($game['status'] ?? 'aktif') !== 'aktif') {
             $this->abort(404, 'Game tidak ditemukan atau sedang tidak aktif');
         }
 
@@ -66,14 +102,26 @@ class PermainanController extends Controller
 
         try {
             $musikGame = $this->permainanPengaturanModel->get()['musik_game'] ?? null;
-        } catch (PDOException $e) {
+        } catch (Throwable $e) {
             $musikGame = null;
         }
 
+        try {
+            $leaderboard = $this->skorModel->getTop($slug, 10);
+        } catch (Throwable $e) {
+            $leaderboard = [];
+        }
+
+        try {
+            $pengaturan = $this->pengaturanModel->get();
+        } catch (Throwable $e) {
+            $pengaturan = [];
+        }
+
         $this->view($viewMap[$slug], [
-            'pengaturan' => $this->pengaturanModel->get(),
+            'pengaturan' => $pengaturan,
             'game' => $game,
-            'leaderboard' => $this->skorModel->getTop($slug, 10),
+            'leaderboard' => $leaderboard,
             'musikGame' => $musikGame,
         ]);
     }
@@ -86,7 +134,12 @@ class PermainanController extends Controller
         $skor = (int) ($_POST['skor'] ?? 0);
         $detail = Security::clean($_POST['detail'] ?? '');
 
-        $game = $this->gameModel->getBySlug($slug);
+        try {
+            $game = $this->gameModel->getBySlug($slug);
+        } catch (Throwable $e) {
+            $game = null;
+        }
+
         if (!$game) {
             $this->json(['success' => false, 'message' => 'Game tidak valid'], 400);
         }
@@ -101,8 +154,19 @@ class PermainanController extends Controller
                 'detail' => $detail,
             ]);
             $this->json(['success' => true]);
-        } catch (PDOException $e) {
-            $this->json(['success' => false, 'message' => 'Tabel skor belum siap di database.'], 500);
+        } catch (Throwable $e) {
+            try {
+                $this->skorModel->ensureTable();
+                $this->skorModel->insert([
+                    'game_slug' => $slug,
+                    'nama_pemain' => $nama,
+                    'skor' => max(0, $skor),
+                    'detail' => $detail,
+                ]);
+                $this->json(['success' => true]);
+            } catch (Throwable $e2) {
+                $this->json(['success' => false, 'message' => 'Gagal menyimpan skor.'], 500);
+            }
         }
     }
 }

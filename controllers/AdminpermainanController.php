@@ -20,11 +20,11 @@ class AdminpermainanController extends Controller
     {
         try {
             $pengaturan = $this->pengaturanModel->get();
+            $this->gameModel->ensureTable();
             $daftarGame = $this->gameModel->all('urutan ASC, id ASC');
         } catch (PDOException $e) {
             $pengaturan = ['tampil_menu' => 'ya'];
-            $daftarGame = [];
-            $_SESSION['flash_error'] = 'Tabel permainan belum ada di database. Jalankan migrasi permainan_pengaturan / permainan_game / permainan_skor terlebih dahulu.';
+            $daftarGame = $this->gameModel->getAktif();
         }
 
         $this->view('admin/permainan/index', [
