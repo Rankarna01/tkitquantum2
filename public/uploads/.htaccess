@@ -1,0 +1,18 @@
+# Folder ini hanya untuk menyimpan file upload (gambar/PDF) — jangan pernah
+# jalankan PHP di sini walau validasi MIME sudah dilakukan saat upload.
+<FilesMatch "\.(php|phtml|php3|php4|php5|php7|pht|phar)$">
+    Require all denied
+</FilesMatch>
+
+# Nonaktifkan directory listing
+Options -Indexes -ExecCGI
+
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>

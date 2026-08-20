@@ -1,0 +1,14 @@
+# Blokir akses langsung ke file sensitif (tidak butuh mod_rewrite)
+<FilesMatch "\.(env|sql|log|ini)$">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+</IfModule>
+
+# Nonaktifkan directory listing
+Options -Indexes

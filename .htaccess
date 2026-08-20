@@ -1,0 +1,11 @@
+# Folder ini (di luar /public) tidak boleh diakses langsung lewat browser.
+# Perlindungan detail per-folder ada di config/, core/, controllers/, models/,
+# database/, dan storage/ masing-masing (lihat .htaccess di dalamnya).
+# File ini sengaja TIDAK memakai RewriteRule berbasis path absolut supaya
+# tidak error walau project diletakkan di subfolder htdocs mana pun.
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+</IfModule>
+
+Options -Indexes
