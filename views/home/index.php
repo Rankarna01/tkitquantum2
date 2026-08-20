@@ -25,18 +25,29 @@
         </div>
         <?php endforeach; ?>
       <?php else: ?>
-        <div class="carousel-item active">
-          <img src="https://images.unsplash.com/photo-1587616211892-b407747f8a9b?w=1600&q=80" alt="Anak-anak TK bermain bersama">
-        </div>
-        <div class="carousel-item">
-          <img src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=1600&q=80" alt="Kegiatan belajar sambil bermain">
-        </div>
-        <div class="carousel-item">
-          <img src="https://images.unsplash.com/photo-1526634332515-d56c5fd16991?w=1600&q=80" alt="Anak-anak TK ceria di kelas">
-        </div>
-        <div class="carousel-item">
-          <img src="https://images.unsplash.com/photo-1544776193-352d25ca82cd?w=1600&q=80" alt="Kegiatan kreativitas anak">
-        </div>
+        <?php
+          $localHeroFiles = glob(dirname(__DIR__, 2) . '/public/uploads/hero/*.{jpg,jpeg,png,webp,JPG,PNG}', GLOB_BRACE);
+        ?>
+        <?php if (!empty($localHeroFiles)): ?>
+          <?php foreach ($localHeroFiles as $i => $lh): ?>
+          <div class="carousel-item <?= $i === 0 ? 'active' : '' ?>">
+            <img src="<?= $this->appConfig['base_url'] ?>/uploads/hero/<?= htmlspecialchars(basename($lh)) ?>" alt="TK IT Quantum School">
+          </div>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <div class="carousel-item active">
+            <img src="https://images.unsplash.com/photo-1587616211892-b407747f8a9b?w=1600&q=80" alt="Anak-anak TK bermain bersama">
+          </div>
+          <div class="carousel-item">
+            <img src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=1600&q=80" alt="Kegiatan belajar sambil bermain">
+          </div>
+          <div class="carousel-item">
+            <img src="https://images.unsplash.com/photo-1526634332515-d56c5fd16991?w=1600&q=80" alt="Anak-anak TK ceria di kelas">
+          </div>
+          <div class="carousel-item">
+            <img src="https://images.unsplash.com/photo-1544776193-352d25ca82cd?w=1600&q=80" alt="Kegiatan kreativitas anak">
+          </div>
+        <?php endif; ?>
       <?php endif; ?>
     </div>
     <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">

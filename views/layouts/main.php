@@ -76,15 +76,18 @@
   .btn-ghost-light:hover{background:#fff; color:var(--ink); transform:translateY(-2px);}
 
   /* Hero carousel — ceria, sudut membulat */
-  .hero-carousel{background:var(--ink); overflow:hidden;}
+  .hero-carousel{background:var(--ink); overflow:hidden; padding:0 !important;}
   .hero-carousel .carousel-item{height:520px;}
   .hero-carousel .carousel-item img{width:100%; height:520px; object-fit:cover; filter:brightness(.8) saturate(1.15); transform:scale(1.03); animation:kenburns 9s ease-in-out infinite alternate;}
   @keyframes kenburns{ from{transform:scale(1.0);} to{transform:scale(1.08);} }
   .hero-carousel::after{content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(43,42,74,.05) 0%, rgba(43,42,74,.55) 100%); pointer-events:none;}
   .hero-carousel::before{content:''; position:absolute; left:0; right:0; bottom:-2px; height:60px; background:var(--paper); border-radius:50% 50% 0 0 / 100% 100% 0 0; transform:scaleX(1.4); z-index:4;}
-  .hero-caption{position:absolute; left:6%; bottom:56px; max-width:460px; background:rgba(255,253,248,.98); border-radius:24px; padding:28px 30px; box-shadow:0 20px 45px rgba(0,0,0,.25); z-index:5; border-top:5px solid var(--gold-deep);}
+  .hero-caption{position:absolute; left:6%; bottom:70px; max-width:480px; background:rgba(255,253,248,.98); border-radius:24px; padding:28px 30px; box-shadow:0 20px 45px rgba(0,0,0,.25); z-index:5; border-top:5px solid var(--gold-deep);}
   .hero-caption .hero-eyebrow{letter-spacing:.06em; text-transform:uppercase; font-size:.75rem; font-weight:700; color:var(--gold-deep);}
-  @media (max-width:768px){ .hero-carousel .carousel-item, .hero-carousel .carousel-item img{height:420px;} .hero-caption{position:static; margin-top:-56px; max-width:100%;} }
+  @media (max-width:768px){ 
+    .hero-carousel .carousel-item, .hero-carousel .carousel-item img{height:380px;} 
+    .hero-caption{position:relative; left:auto; bottom:auto; margin:-40px 16px 24px; max-width:calc(100% - 32px); box-shadow:0 12px 30px rgba(0,0,0,.15);} 
+  }
 
   /* Stat bar */
   .stat-pill{background:#fff; border:2px dashed var(--gold-pale); border-radius:20px; box-shadow:0 4px 14px rgba(43,42,74,.06); transition:.25s;}
